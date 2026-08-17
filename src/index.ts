@@ -1,5 +1,5 @@
 /**
- * binp-context-menu — seven context-menu directions as one React library.
+ * context menu — seven context-menu directions as one React library.
  *
  * The whole integration is: wrap a tree in `<ContextMenuProvider>`, spread
  * `useContextMenu().triggerProps` onto whatever the commands act on, and hand

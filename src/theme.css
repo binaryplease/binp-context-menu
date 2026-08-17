@@ -1,4 +1,4 @@
-/* Design tokens for binp-context-menu — inherited from the design system of the
+/* Design tokens for context menu — inherited from the design system of the
    app this library was first built for, by way of its single-file prototype.
 
    Kept in its own file with no `@import "tailwindcss"` so it can be shared two

@@ -22,6 +22,22 @@ repo's root — is now the demo, replaced in place by `mise run publish`. There 
 one live "context menu, reinvented" and it is built from `demo/`. Publishing from
 anywhere else forks the link in two.
 
+### The project has three names, and they are not interchangeable
+
+A rename here is not a find-and-replace, because `binp-context-menu` is doing
+three unrelated jobs and only one of them changed.
+
+| Name | Where it appears | Why |
+|---|---|---|
+| **context menu** | prose that names the project to a human — the README's H1, the demo's wordmark and board, the `<title>`s, the third-party notices heading | the display name, no prefixes. `binp-` is the owner's repo-naming convention, which is not something a reader of the library needs |
+| **`binp-context-menu`** | `package.json`'s `name`, every import specifier and the `theme.css` path, the GitHub repo and every URL into it, `data-binp-context-menu-*`, the default `storageKey`, the demo's four localStorage keys, `[binp-context-menu]` log prefixes | the identifier. Hosts mount this library by aliasing its source, so the manifest name is *their* import specifier; the rest are flat global namespaces (DOM, per-origin storage) that no npm scope reaches and that this library shares with the host app it mounts inside |
+| **`@binaryplease/context-menu`** | the README's install section, as the name a registry release will take | reserved, not in force. npm publishing is deferred; nothing is on the registry, and the `@binaryplease` scope is unclaimed |
+
+So: do not rename the manifest, the DOM attributes, the storage keys or the log
+prefixes to match the display name. The manifest name moves on the day the
+package is first published to npm — that is one breaking change for the host
+that aliases it, and it is spent once.
+
 ## Stack & commands
 
 Bun + TypeScript + React 19 + Tailwind v4 + Zod, strict, ESM, no build step for
@@ -193,7 +209,7 @@ would not tell you.
 - **A radial surface is sized by its labels, not the other way round.** The
   Compass wheel and the Orbit field both used to be a fixed frame around variable
   content, and a real host command set — labels the length of "New task in
-  binp-context-menu" — sailed straight off them.
+  context menu" — sailed straight off them.
   `compass.diameter`, `compass.itemRingRadius` and each
   `orbit.rings[].radius` are now *floors*: `useLabelMetrics` measures the labels,
   `radialFit` turns the boxes into a radius, and the field grows until they fit —

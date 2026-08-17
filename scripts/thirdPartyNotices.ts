@@ -55,13 +55,13 @@ function escapeHtml(text: string): string {
 function renderNoticesPage(noticesText: string, licenseText: string): string {
   // No "-- MIT License" on the heading: LICENSE opens by naming itself, and a
   // heading that says it first only makes the reader read it twice.
-  const body = `${noticesText}\n\n## binp-context-menu\n\n${licenseText}`
+  const body = `${noticesText}\n\n## context menu\n\n${licenseText}`
   return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>binp-context-menu · third-party notices</title>
+    <title>context menu · third-party notices</title>
     <style>
       :root {
         color-scheme: light dark;

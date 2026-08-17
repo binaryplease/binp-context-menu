@@ -135,7 +135,7 @@ export function App() {
         <aside className="flex w-[276px] shrink-0 flex-col gap-1 overflow-y-auto border-r border-cm-rule bg-cm-bg px-4 py-6">
           <div className="px-1.5 pb-1">
             <div className="font-cm-mono text-[11px] font-medium tracking-[0.06em] text-cm-accent">
-              binp-context-menu
+              context menu
             </div>
             <h1 className="mt-1.5 text-[18px] leading-tight font-extrabold tracking-[-0.02em]">
               The context menu,
@@ -195,7 +195,7 @@ export function App() {
               <div className="mx-auto flex max-w-[720px] flex-col gap-3.5">
                 <div className="flex items-center gap-2.5 px-0.5 pb-1">
                   <span className="size-2.5 rounded-full bg-cm-accent" />
-                  <span className="font-bold tracking-[-0.01em]">binp-context-menu</span>
+                  <span className="font-bold tracking-[-0.01em]">context menu</span>
                   <span className="text-[13px] text-cm-ink-3">New task</span>
                 </div>
                 {TASKS.map((task) => (
@@ -428,7 +428,7 @@ function TaskCard({ task }: { task: DemoTask }) {
         <div className="min-w-0">
           <h3 className="text-[15.5px] font-bold tracking-[-0.01em]">{task.title}</h3>
           <div className="mt-1.5 flex items-center gap-2.5 text-[12.5px] text-cm-ink-3">
-            <span>binp-context-menu</span>
+            <span>context menu</span>
             {task.role === null ? null : (
               <>
                 <span className="text-cm-rule-2">|</span>
