@@ -1,0 +1,21 @@
+# A security report must not arrive as a public issue, so the blank-issue escape
+# hatch is closed and the private channel is offered here instead.
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/binaryplease/binp-context-menu/security/advisories/new
+    about: >
+      Private vulnerability reporting — please use this rather than a public
+      issue. See SECURITY.md for what is in scope.
+  # Deliberately points at documentation rather than Discussions: this link is
+  # rendered whether or not that feature is switched on, and a contact link to a
+  # disabled feature is a 404 on the project's first day. If Discussions is ever
+  # enabled, add it here as a third entry.
+  - name: Not sure it is a bug? Read the docs first
+    about: >
+      README.md is canonical for the public API — `Command` is host data, so a
+      surprising label, icon or href is often the mount rather than the library.
+      AGENTS.md's primitives table answers "is there already something that does
+      this?", and the answer is usually yes. If it still looks wrong, open a bug
+      report and say what you expected.
+    url: https://github.com/binaryplease/binp-context-menu#readme

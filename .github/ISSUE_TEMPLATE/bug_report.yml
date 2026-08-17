@@ -1,0 +1,94 @@
+name: Bug report
+description: Something in the library behaves differently than documented.
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. One note before you start: if this is a
+        **security** issue, please close this and use
+        [private vulnerability reporting](https://github.com/binaryplease/binp-context-menu/security/advisories/new)
+        instead — a public issue is the wrong channel for it.
+
+  - type: dropdown
+    id: direction
+    attributes:
+      label: Which direction?
+      description: >
+        Several of these surfaces share primitives, so knowing whether a bug is
+        in one direction or all seven is usually the fastest split.
+      multiple: true
+      options:
+        - 00 Original
+        - 01 Whisper
+        - 02 Compass
+        - 03 Strata
+        - 04 Orbit
+        - 05 Sigil
+        - 05B Sigil Pad
+        - The settings panel
+        - All of them / not direction-specific
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened, and what you expected instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: >
+        The shortest path you have. A minimal `Command[]` and config that shows
+        it is worth more than a description of a large app.
+      placeholder: |
+        1. Mount ContextMenuProvider with these commands …
+        2. Right-click the board …
+        3. …
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: '0.1.0, or a commit SHA'
+    validations:
+      required: true
+
+  - type: input
+    id: peers
+    attributes:
+      label: React and Zod versions
+      description: >
+        Zod especially — the peer range is `^3.24 || ^4` and it resolves against
+        *your* copy, so which major you are on is load-bearing.
+      placeholder: 'react 19.1.0, zod 3.24.4'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Does it happen in both themes?
+      description: >
+        A colour or contrast bug is often invisible in one of the two. If you
+        have not checked both, say so — that is a useful answer.
+      options:
+        - Both light and dark
+        - Light only
+        - Dark only
+        - Not a visual bug
+        - Have not checked
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and OS
+      placeholder: 'Firefox 141 on Linux'

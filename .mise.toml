@@ -1,0 +1,35 @@
+[tools]
+bun = "1"
+
+[tasks.dev]
+description = "Run the demo (Vite; allocates a free port before binding it strictly)"
+run = "bunx vite"
+
+[tasks.build]
+description = "Build the demo bundle into dist/demo"
+run = "bunx vite build"
+
+[tasks.typecheck]
+description = "Type-check the library, the demo, and the tests"
+run = "bunx tsc --noEmit"
+
+[tasks.test]
+description = "Run unit tests"
+run = "bun test"
+
+[tasks.lint]
+# The guard third of one descriptor, one wrapper, one guard.
+description = "Surface guard — fails when a surface bypasses a shared primitive"
+run = "bun scripts/guard-surfaces.ts"
+
+[tasks.check]
+description = "Everything CI would run: typecheck + guard + tests"
+depends = ["typecheck", "lint", "test"]
+
+# Builds first, through mise's own dependency graph rather than a `&&` chain, so
+# a failed build never reaches the upload. Task-runner entries call their tools
+# directly, through the runner's own flags rather than shell control flow.
+[tasks.publish]
+description = "Build the demo and replace its zink entry in place (the slug in .zink-slug)"
+depends = ["build"]
+run = "bun scripts/publish-demo.ts"

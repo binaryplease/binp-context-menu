@@ -1,0 +1,6 @@
+# `test/command-schema.test.ts` carries a NUL byte on purpose: it asserts that a
+# control-character evasion of the `javascript:` refusal is refused. That one
+# byte makes git classify the whole file binary, so `git grep` answers "Binary
+# file … matches" and shows nothing — which is how a stale comment once survived
+# two text sweeps of this tree. Marking it textual restores `git grep` over it.
+test/command-schema.test.ts diff

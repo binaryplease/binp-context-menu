@@ -1,0 +1,368 @@
+/* Design tokens for binp-context-menu — inherited from the design system of the
+   app this library was first built for, by way of its single-file prototype.
+
+   Kept in its own file with no `@import "tailwindcss"` so it can be shared two
+   ways over one definition — the palette is the invariant, so it is expressed
+   once at that size: the demo pulls it in after Tailwind, and
+   an embedding host imports `binp-context-menu/theme.css` into *its* Tailwind
+   build so the mounted surfaces read with the identical palette. Every token is
+   namespaced `cm-*` and deliberately disjoint from a host app's own tokens, so
+   merging them into a host `:root` collides with nothing.
+
+   Re-theming is a supported form of configuration: override any `--color-cm-*`
+   in your own CSS and every surface follows, because the generated utilities
+   read through `var()`.
+
+   Hosts must also point Tailwind at this package's source so the utilities the
+   components use are emitted:
+
+     @import "tailwindcss";
+     @import "binp-context-menu/theme.css";
+     @source "../node_modules/binp-context-menu/src";
+
+   ── Light and dark ──────────────────────────────────────────────────────
+   Every colour that differs between the two themes is a *single*
+   `light-dark(light, dark)` pair, so one token carries both palettes and there
+   is no second copy to keep in sync. Which half resolves is decided by the CSS
+   `color-scheme` property, which is inherited — see the switches at the bottom
+   of this file. A colour that is deliberately the *same* in both (the ink on a
+   saturated fill, the casting field's chrome) is written as a plain value with
+   a comment saying why, rather than as a pair with two identical halves.
+
+   This is the same mechanism a `color-scheme`-driven host design system uses,
+   which is what lets such a host re-point these tokens at its own `light-dark()`
+   pairs and have the menu flip with the app instead of carrying a second dark
+   copy.
+*/
+
+@theme {
+  --font-cm-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --font-cm-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "Cascadia Mono", monospace;
+
+  /* Surfaces, from the page up to the panel that floats over it. The dark half
+     swaps the warm paper neutrals for cool slate charcoals. */
+  --color-cm-bg: light-dark(#ffffff, #1b1d22);
+  --color-cm-bg-soft: light-dark(#fbfbfa, #181a1f);
+  --color-cm-bg-mute: light-dark(#f7f7f5, #16181c);
+  --color-cm-bg-sink: light-dark(#eeeeea, #101216);
+
+  /* Ink, four steps from statement to whisper. */
+  --color-cm-ink: light-dark(#14140f, #eef0f5);
+  --color-cm-ink-2: light-dark(#565650, #aeb2bb);
+  --color-cm-ink-3: light-dark(#9a9a90, #7e828c);
+  --color-cm-ink-4: light-dark(#bcbcb2, #565a64);
+
+  --color-cm-rule: light-dark(#ececec, #262830);
+  --color-cm-rule-2: light-dark(#dcdcd4, #353844);
+
+  /* The library's own accent. Command *kinds* carry their own colours as data —
+     these are for chrome that belongs to no kind. The dark half lifts the violet
+     off the page rather than sinking it into one. */
+  --color-cm-accent: light-dark(#7c3aed, #a78bfa);
+  --color-cm-accent-soft: light-dark(#f5f3ff, #221c3a);
+  /* Field chrome on the casting surface, which is dark under both themes. */
+  --color-cm-accent-lift: #c4b5fd;
+
+  /* Ink that sits on a *filled* accent — the cast button's caption, its progress
+     wipe. It flips with the accent, not with the page: the dark theme's accent
+     is a light violet, and white on light violet is unreadable. */
+  --color-cm-on-accent: light-dark(#ffffff, #17102b);
+  /* Ink that sits on a filled *kind* colour — an Orbit bubble's icon and rim.
+     Deliberately scheme-independent: a bubble is a saturated colour under both
+     themes, so what reads on it does not change with the page. */
+  --color-cm-on-tone: #ffffff;
+
+  /* How far a host-supplied kind colour is lifted so it stays legible on the
+     active surface — see the `--cm-kind-lift` switches at the bottom. A kind's
+     colour is host *data*, usually picked against a white page, so the dark
+     theme pulls it toward the ink instead of leaving it to sink into the
+     charcoal. A host that supplies dark-aware kind colours itself (a `.color`
+     may be any CSS colour, `light-dark()` included) turns this off with
+     `--cm-kind-lift-dark: transparent 0%`. */
+
+  /* What a destructive command is painted in, overriding its kind's colour on
+     every surface (`commandTone.ts`). One token, so a host that re-themes gets
+     the cancel row, the cancel slice and the cancel bubble in one edit. */
+  --color-cm-danger: light-dark(#dc2626, #f87171);
+  --color-cm-danger-soft: light-dark(#fef2f2, #351a1c);
+
+  /* What dims the board when a surface takes over. */
+  --color-cm-scrim: light-dark(rgb(20 20 15 / 0.16), rgb(0 0 0 / 0.5));
+
+  /* Interaction state is a shared token, not a per-surface re-declaration:
+     every row, slice, lane and rune hovers with these. */
+  --color-cm-hover: light-dark(#f7f7f5, #23262e);
+  --color-cm-active: light-dark(#eeeeea, #2b2f39);
+  --color-cm-match: light-dark(rgb(124 58 237 / 0.22), rgb(167 139 250 / 0.32));
+
+  /* ── The casting field (Sigil, Sigil Pad) ──────────────────────────────
+     The field is a veil over the board under *both* themes — that is the
+     surface's whole material — so only its white-hot trail core is a plain
+     value; the veil, the hue and everything derived from it are pairs, because
+     what shows through a wash is the page. The trail's three colours are read
+     back imperatively by the canvas painter (`resolveColourToken`), which is why
+     they live here rather than in the paint code — a `var()` chain and a
+     `color-mix()` both resolve there, so deriving them costs the painter
+     nothing.
+
+     The field's hue is `--color-cm-cast-accent` and *not* `--color-cm-accent`,
+     even though the two ship the same violet. The menu's accent is chrome laid
+     over a host's own board — a caret, an active row, a hub ring — so a host
+     re-points it at whatever its own interaction colour is; the field is a
+     takeover surface with none of the host's board left on it, and its hue is
+     the material everything on it is made of. One token would force a host to
+     choose between a menu that reads as its app and a field that reads as one
+     thing, which is what happened to the first host to re-theme this library: an
+     interaction-blue accent left a violet trail under blue instruments. Everything the field paints
+     derives from it, so re-pointing this one token carries the whole surface —
+     the trail, the ring, the runes, the instrument edges and the glow alike.
+     (Keyboard focus rings on the field stay `--color-cm-accent`: a focus ring is
+     the host app's, not the surface's.) */
+  --color-cm-cast-accent: light-dark(#7c3aed, #a78bfa);
+  --color-cm-cast-veil-near: light-dark(rgb(22 18 38 / 0.09), rgb(10 8 20 / 0.46));
+  --color-cm-cast-veil-far: light-dark(rgb(18 15 32 / 0.26), rgb(3 2 8 / 0.72));
+  --color-cm-cast-ink: #ffffff;
+  /* The accent lifted clear of the field, for the one thing drawn *on* the veil
+     rather than in it: the echo of the pad a stroke was launched from. */
+  --color-cm-cast-rune: light-dark(#6d28d9, #c4b5fd);
+  --color-cm-cast-trail: color-mix(in srgb, var(--color-cm-cast-accent) 85%, transparent);
+  --color-cm-cast-glow: var(--color-cm-cast-accent);
+
+  /* The field's *instruments* — the Lexicon, the reading card, the mute toggle.
+     They are the only opaque things on the casting surface, and painting them in
+     the page's panel colours made them read as chrome from another screen that
+     had wandered in: a white plate is the brightest object on a lightly veiled
+     board, and a slate one is a second, flatter charcoal beside the veil.
+
+     So an instrument is the page's surface *tinted toward the rune*, and it is
+     glass rather than paint — the veil shows through it, which is what puts it on
+     the field instead of over it. These are pairs and not the field's own fixed
+     values because what is *read* on them (a command's label, its explanation)
+     is the page's ink, and ink and plate have to flip together.
+
+     `-edge` is the field's hue at low alpha, which is the same colour the ring
+     and the trail are drawn in; `-seam` is that edge again, quieter, for the
+     hairlines *inside* an instrument. Kept apart because the edge is what makes
+     a plate an object and the seams are what divide it — a host re-pointing one
+     rarely means the other. */
+  --color-cm-cast-plate: light-dark(rgb(253 252 255 / 0.87), rgb(26 23 42 / 0.9));
+  --color-cm-cast-plate-edge: color-mix(in srgb, var(--color-cm-cast-accent) 27%, transparent);
+  --color-cm-cast-plate-seam: color-mix(in srgb, var(--color-cm-cast-accent) 14%, transparent);
+  /* The halo that lifts the field's one line of prose off the board behind it.
+     It inverts, because the prose does: the caption is set in the ink token, and
+     a light caption wants a dark halo where a dark one wants a light halo. */
+  --color-cm-cast-shadow: light-dark(rgb(255 255 255 / 0.85), rgb(0 0 0 / 0.78));
+
+  /* ── The explanation on an unavailable command ─────────────────────────
+     `CommandButton`'s chip — the one piece of chrome that can show up on all
+     seven surfaces, because a command that cannot run is unavailable on every
+     one of them ("unavailable is never invisible").
+
+     It used to be the ink token with the page's background as its text: an
+     inverted slab, which on a light board is a black rectangle and reads as a
+     browser tooltip that wandered in from another application — loudest object
+     on the screen, and loudest of all over the casting field, whose whole
+     material is a quiet wash. What it actually is, is a floated *instrument*,
+     and this library already has one material for those: the plate the reading
+     card and the mute toggle stand on. So these are aliases of it rather than a
+     second glass with its own idea of the same thing, and the chip picks up the
+     field's hue on its edge and in its glow for free.
+
+     Aliases, like the pad's below: a host that wants the explanation in its own
+     colour re-points these three and nothing else moves. */
+  --color-cm-tip: var(--color-cm-cast-plate);
+  --color-cm-tip-edge: var(--color-cm-cast-plate-edge);
+
+  /* ── The cast pad (Sigil Pad) ──────────────────────────────────────────
+     The pad is the one piece of this library that lives *on a host's own
+     surface* — a patch at the end of someone else's card, on screen before any
+     menu is invoked and whether or not one ever is. So it is painted in
+     neutrals: in the accent it read as the library's brand stamped across every
+     row of the host's board, and it competed with the host's own controls for
+     the eye. Everything violet about casting belongs inside the field, which is
+     the library's own surface to own.
+
+     Aliases, not copies: each points at a palette token that already carries
+     both themes, so the pad follows a re-pointed palette for free. A host that
+     wants the pad to carry its own colour — an accent, a per-object tint —
+     overrides these three and nothing else moves. The dashes, the grain and the
+     trace animation are the pad's shape, not its colour; they stay. (Which grain,
+     and whether the traced mark is drawn at all, is the *user's*
+     `config['sigil-pad']` — every pattern mixes from the ink token below, so a
+     re-pointed pad takes all five with it.) */
+  --color-cm-pad-fill: var(--color-cm-bg-mute);
+  --color-cm-pad-edge: var(--color-cm-rule-2);
+  /* `ink-2`, not the fainter `ink-3` the pad's dimensions invite: the caption is
+     9px uppercase mono on a tinted fill, and the third ink step does not carry
+     that at any opacity worth reading. */
+  --color-cm-pad-ink: var(--color-cm-ink-2);
+
+  --radius-cm-sm: 6px;
+  --radius-cm-md: 8px;
+  --radius-cm-lg: 10px;
+  --radius-cm-xl: 16px;
+
+  /* Elevation. A shadow is not a colour, so the pair goes in its colour slot —
+     dark surfaces need a deeper, more opaque shadow to read as lifted at all. */
+  --shadow-cm-card: 0 1px 2px light-dark(rgb(20 20 15 / 0.04), rgb(0 0 0 / 0.45));
+  --shadow-cm-card-lift: 0 4px 18px -8px light-dark(rgb(20 20 15 / 0.12), rgb(0 0 0 / 0.62));
+  --shadow-cm-panel: 0 1px 2px light-dark(rgb(20 20 15 / 0.05), rgb(0 0 0 / 0.5)),
+    0 14px 40px -12px light-dark(rgb(20 20 15 / 0.18), rgb(0 0 0 / 0.72));
+  --shadow-cm-bubble: 0 6px 18px -6px light-dark(rgb(20 20 15 / 0.28), rgb(0 0 0 / 0.68));
+  /* A Strata lane, lifting under the pointer. */
+  --shadow-cm-lane: 0 6px 20px -10px light-dark(rgb(20 20 15 / 0.18), rgb(0 0 0 / 0.66));
+  /* The Compass hub — a ring of surface punched out of the wheel, plus a lift. */
+  --shadow-cm-hub: inset 0 0 0 5px var(--color-cm-bg),
+    0 2px 10px light-dark(rgb(20 20 15 / 0.06), rgb(0 0 0 / 0.55));
+  /* 05B's echo of the pad the stroke was launched from — the field's own glow,
+     so it is the field's hue rather than a second violet written out here. */
+  --shadow-cm-cast-origin: 0 0 26px color-mix(in srgb, var(--color-cm-cast-accent) 50%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--color-cm-cast-accent) 30%, transparent);
+  /* An instrument's elevation. The third layer is the field's own glow rather
+     than a neutral shadow, so a plate sits in the light the trail and the ring
+     are already casting instead of punching a grey hole in it. */
+  --shadow-cm-cast-plate: 0 1px 2px light-dark(rgb(20 20 15 / 0.06), rgb(0 0 0 / 0.5)),
+    0 18px 46px -14px light-dark(rgb(30 12 70 / 0.24), rgb(0 0 0 / 0.76)),
+    0 0 44px -14px color-mix(in srgb, var(--color-cm-cast-accent) 42%, transparent);
+  /* The explanation's elevation — the instrument shadow above, aliased for the
+     same reason its plate is. It floats over every surface, including one that
+     is already a wash over the host's board, so it needs the glow to read as
+     lifted rather than as a lighter patch of veil. */
+  --shadow-cm-tip: var(--shadow-cm-cast-plate);
+
+  /* The Compass wheel is an SVG, so its elevation is a filter, not a box. */
+  --drop-shadow-cm-wheel: 0 16px 46px light-dark(rgb(20 20 15 / 0.18), rgb(0 0 0 / 0.72));
+
+  --animate-cm-pop: cm-pop 0.13s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  --animate-cm-modal-pop: cm-modal-pop 0.17s cubic-bezier(0.2, 0.9, 0.3, 1.15);
+  --animate-cm-scrim-in: cm-scrim-in 0.16s ease;
+  --animate-cm-bubble-in: cm-bubble-in 0.16s cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards;
+  --animate-cm-origin-in: cm-origin-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  --animate-cm-ring-spin: cm-ring-spin 16s linear infinite;
+  --animate-cm-trace: cm-trace 0.62s ease forwards;
+  /* The settings panel swapping in the active direction's own knobs. Short and
+     small: it is a *replacement* in place, not an entrance. */
+  --animate-cm-section-in: cm-section-in 0.18s cubic-bezier(0.2, 0.9, 0.3, 1);
+
+  @keyframes cm-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(-2px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes cm-modal-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.97) translateY(4px);
+    }
+  }
+  @keyframes cm-scrim-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes cm-bubble-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.55);
+    }
+  }
+  @keyframes cm-origin-in {
+    from {
+      opacity: 0;
+      transform: scale(1.18);
+    }
+  }
+  @keyframes cm-ring-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes cm-section-in {
+    from {
+      opacity: 0;
+      transform: translateY(-3px);
+    }
+  }
+  @keyframes cm-trace {
+    from {
+      stroke-dashoffset: 78;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+}
+
+/* ── Which palette resolves ───────────────────────────────────────────────
+   `color-scheme` is an inherited property, so declaring it on any ancestor
+   flips every `light-dark()` token in the subtree below — including a host's
+   `<html>`. Two mechanisms, in this order of authority:
+
+     1. A host that has pinned a theme says so with a class or an attribute on
+        an ancestor — `.dark` / `.light`, or `[data-theme="dark"]` /
+        `[data-theme="light"]`. `.dark`/`.light` is what most design systems
+        already write onto `<html>`, so such a host needs no extra wiring; a
+        follow-the-OS mode that sets neither class lands on mechanism 2, which
+        is exactly what it means.
+     2. Nobody has pinned one → follow `prefers-color-scheme`.
+
+   The default is expressed as `:root:not(…)` rather than as a rule a host's
+   class is expected to *out-cascade*: the exclusion lives in the selector, so
+   it holds regardless of `@layer` order and source order, both of which a host
+   controls and we do not.
+
+   `color-scheme` is declared, not merely relied on, so the things the UA paints
+   for us — form controls inside the settings panel, scrollbars on the Lexicon
+   and the settings body, the default focus ring — follow the palette too.
+
+   `--cm-kind-lift` rides along in the same three rules so it can never
+   disagree with the resolved palette. It is the mix a host-supplied kind colour
+   is lifted by (`commandTone.ts`); a host that supplies its own dark-aware kind
+   colours opts out with `:root { --cm-kind-lift-dark: transparent 0% }`.
+*/
+:where(:root) {
+  --cm-kind-lift-light: transparent 0%;
+  --cm-kind-lift-dark: var(--color-cm-ink) 30%;
+  --cm-kind-lift: var(--cm-kind-lift-light);
+}
+
+:root:not(.light):not(.dark):not([data-theme="light"]):not([data-theme="dark"]) {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light):not(.dark):not([data-theme="light"]):not([data-theme="dark"]) {
+    --cm-kind-lift: var(--cm-kind-lift-dark);
+  }
+}
+
+.dark,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --cm-kind-lift: var(--cm-kind-lift-dark);
+}
+
+.light,
+[data-theme="light"] {
+  color-scheme: light;
+  --cm-kind-lift: var(--cm-kind-lift-light);
+}
+
+/* Motion is decoration here — every surface is fully usable without it. Honour
+   the OS-level request to stop moving things. */
+@media (prefers-reduced-motion: reduce) {
+  [data-binp-context-menu-layer] *,
+  [data-binp-context-menu-dialog] *,
+  [data-binp-context-menu-settings] *,
+  [data-binp-context-menu-cast-pad] * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "name": "binp-context-menu",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Seven context-menu surfaces as one React library — configurable, persistable through your own persist functions",
+  "license": "MIT",
+  "author": "binaryplease",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./theme.css": "./src/theme.css"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "dev": "bunx vite",
+    "build": "bunx vite build",
+    "typecheck": "bunx tsc --noEmit",
+    "test": "bun test",
+    "guard": "bun scripts/guard-surfaces.ts",
+    "check": "bunx tsc --noEmit && bun scripts/guard-surfaces.ts && bun test"
+  },
+  "peerDependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zod": "^3.24 || ^4"
+  },
+  "dependencies": {
+    "@tabler/icons-react": "^3.44.0"
+  },
+  "devDependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/bun": "^1.3.9",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.2.0",
+    "typescript": "^5.7",
+    "vite": "^8.0.9",
+    "zod": "^4.1.13"
+  }
+}

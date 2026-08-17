@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/* The library's tokens, merged into the demo's Tailwind build. A host app does
+   exactly this, with `@import "binp-context-menu/theme.css"` and an `@source`
+   over the package's src. */
+@import "../src/theme.css";
+@source "../src";
+
+/* Self-hosted faces — nothing this build needs is fetched from a third party at
+   runtime, so there is no CDN font request. */
+@import "@fontsource-variable/inter";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/600.css";
+
+/* The demo's own tokens, in its own namespace — a host app's colours are its
+   business. Written as a `light-dark()` pair for the same reason the library's
+   are: one definition, both palettes, switched by the `color-scheme` the theme
+   control writes onto <html> (see ./ThemeControl.tsx). */
+@theme {
+  --color-demo-done: light-dark(#16a34a, #4ade80);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+/* No `color-scheme` here: the library's theme.css declares it, following the
+   host's `.light`/`.dark` class and otherwise `prefers-color-scheme`. Pinning
+   `light` at this level is exactly what used to make the dark palette
+   unreachable. */
+body {
+  font-family: var(--font-cm-sans);
+  font-size: 14px;
+  font-feature-settings: "ss01", "cv11", "tnum";
+  -webkit-font-smoothing: antialiased;
+  background: var(--color-cm-bg-mute);
+  color: var(--color-cm-ink);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-cm-accent) 22%, transparent);
+}

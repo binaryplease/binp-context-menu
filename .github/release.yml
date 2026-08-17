@@ -1,0 +1,26 @@
+# Curation for `gh release create --generate-notes`, which composes notes from
+# merged pull request titles and contributor names. That is exactly the metadata
+# a git-history sweep never sees, so it is filtered here rather than read and
+# edited by hand every release.
+changelog:
+  exclude:
+    labels:
+      - no-changelog
+      - duplicate
+      - invalid
+      - question
+  categories:
+    - title: Breaking changes
+      labels: ['breaking']
+    - title: New directions and features
+      labels: ['enhancement', 'feature']
+    - title: Fixes
+      labels: ['bug', 'fix']
+    - title: Accessibility
+      labels: ['a11y']
+    - title: Documentation
+      labels: ['documentation']
+    # Anything unlabelled still appears, so a release note is never silently
+    # short — an uncategorised PR is a labelling gap, not a hidden change.
+    - title: Other changes
+      labels: ['*']

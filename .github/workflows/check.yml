@@ -1,0 +1,41 @@
+name: check
+
+# The gate this repo already declares, run on the changes it already accepts.
+# `mise run check` is typecheck + surface guard + tests (.mise.toml), and CI
+# calls *that task* rather than a re-spelling of its three steps — a workflow
+# that lists the steps itself is a second gate that drifts from the first.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# The gate reads the tree and reports; it writes nothing.
+permissions:
+  contents: read
+
+# A second push supersedes the first — there is nothing to learn from a run
+# against a commit that is already history.
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Installs the toolchain pinned in .mise.toml (bun 1) and puts `mise` and
+      # the tools it manages on PATH, so the runner is running the same versions
+      # a contributor is — and so the next two steps are the same two commands.
+      - uses: jdx/mise-action@v4
+
+      # `--frozen-lockfile` so a dependency cannot drift under CI: a run that
+      # silently resolved a different tree would be green about something other
+      # than the commit.
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck, surface guard, tests
+        run: mise run check

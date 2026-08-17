@@ -1,0 +1,59 @@
+name: Feature request
+description: Propose something the library should do that it does not.
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Two things worth knowing before you write, because they shape what a
+        good proposal here looks like:
+
+        - **Seven surfaces share one affordance**, and that only holds while
+          every surface goes through the shared primitives. A feature that lands
+          in one direction and not the others is usually a request to change a
+          *primitive*, which is a bigger and more interesting change than it
+          looks.
+        - **`Command` is the host's data.** Labels, icons, hrefs, kinds and
+          runes come from the mounting app. If the thing you want is expressible
+          as host data, it may already work — worth checking `README.md` first.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: >
+        The situation, not the solution. What does the menu do today that gets
+        in the way?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like it to do
+    validations:
+      required: true
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: What does this touch?
+      multiple: true
+      options:
+        - One direction
+        - All directions / a shared primitive
+        - The config schema
+        - The settings panel
+        - Theming and tokens
+        - An eighth direction
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you tried, or considered
+      description: >
+        Including "I could do this in my host app, but …" — that is often the
+        most useful part, because it says where the seam is in the wrong place.
