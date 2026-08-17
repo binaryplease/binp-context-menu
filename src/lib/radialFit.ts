@@ -5,7 +5,7 @@
  * Compass and Orbit both used to draw a fixed frame around variable content: a
  * wheel of a configured diameter, a field of configured ring radii, and labels
  * whose length is the host's business. Feed either a real command set — "New task
- * in binp-context-menu", "Open file explorer" — and the text sails off the rim
+ * in context menu", "Open file explorer" — and the text sails off the rim
  * onto the page behind. The wheel has to serve the labels, not the other way
  * round, and that means turning "this box, at this angle" into a number.
  *

@@ -1,6 +1,6 @@
 # Third-party notices
 
-binp-context-menu is under the MIT License. Its text is the LICENSE file at the
+context menu is under the MIT License. Its text is the LICENSE file at the
 root of this repository, and it is reproduced at the foot of this page in the
 copy that ships with the built demo.
 

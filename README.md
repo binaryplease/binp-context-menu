@@ -1,4 +1,4 @@
-# binp-context-menu
+# context menu
 
 **Seven context-menu directions as one React library — configurable, and
 persistable through your own persist functions.**
@@ -37,8 +37,11 @@ bun add github:binaryplease/binp-context-menu    # peers: react, react-dom, zod 
 
 There is no build step to run after it lands: the package exports its
 TypeScript source directly (`exports` points at `src/`), which is also how hosts
-are expected to mount it. When a registry release happens this becomes
-`bun add binp-context-menu`, and nothing else about the mount changes.
+are expected to mount it. When a registry release happens the package lands as
+**`@binaryplease/context-menu`** — the specifiers move with it, to
+`@binaryplease/context-menu` and `@binaryplease/context-menu/theme.css`, and
+nothing else about the mount does. Until then the manifest name is
+`binp-context-menu` and the imports below are what a host writes.
 
 Zod resolves against **your** copy, so the library works on either major — a host
 still on zod 3 mounts it without upgrading, and nothing in `src/` uses an API

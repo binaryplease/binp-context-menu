@@ -10,7 +10,7 @@
  *
  * **Every label is one or two words, and none of them names the project.** The
  * board already says which project this is and the card already says which task,
- * so "New task in binp-context-menu" spends the wheel's scarcest resource — the
+ * so "New task in context menu" spends the wheel's scarcest resource — the
  * length of an arc — restating the context the user is looking at. A menu label
  * is the verb, not the sentence: the same list that read as a paragraph on the
  * Compass reads as a set of directions once it is "New task", "Diff", "Move".
@@ -101,7 +101,7 @@ export const COMMANDS: CommandInput[] = [
     icon: IconBrandStorybook,
     weight: 22,
     monospace: true,
-    disabledReason: 'binp-context-menu has no storybook script in its package.json.',
+    disabledReason: 'context menu has no storybook script in its package.json.',
   },
   { id: 'vscode', label: 'vscode', kindId: 'open', icon: IconCode, weight: 81, monospace: true, keywords: ['editor'] },
   { id: 'kitty', label: 'kitty', kindId: 'open', icon: IconTerminal2, weight: 66, monospace: true, keywords: ['terminal', 'shell'] },
